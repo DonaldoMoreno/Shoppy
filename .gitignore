@@ -1,0 +1,12 @@
+node_modules/
+**/node_modules/
+.env
+.vscode/
+.DS_Store
+dist/
+apps/web/.next/
+**/.turbo/
+coverage/
+npm-debug.log
+yarn-error.log
+.idea/

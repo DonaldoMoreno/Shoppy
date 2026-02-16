@@ -1,0 +1,12 @@
+{
+  "name": "Shoppy Codespace",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "api",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "none",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "forwardPorts": [3000, 3001],
+  "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+}

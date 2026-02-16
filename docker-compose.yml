@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shoppy
+      POSTGRES_PASSWORD: shoppy_pass
+      POSTGRES_DB: shoppy_dev
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  minio:
+    image: minio/minio:latest
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - '9000:9000'
+    volumes:
+      - minio-data:/data
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379
+      - S3_ENDPOINT=http://minio:9000
+      - S3_BUCKET=shoppy
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./:/workspace
+    command: sh -c "cd apps/api && pnpm dev"
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/workspace
+    command: sh -c "cd apps/web && pnpm dev"
+
+volumes:
+  db-data:
+  minio-data:
